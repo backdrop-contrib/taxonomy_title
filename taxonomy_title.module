@@ -1,0 +1,67 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_help()
+ */
+function taxonomy_title_help($section = '') {
+  switch ($section) {
+    case 'admin/content/taxonomy':
+      return t('<p>Set the page title on your Taxonomy pages.</p>');
+    case 'admin/help#quiz':
+      return t('<p>Set the page title on your Taxonomy pages.</p>');
+  }
+}
+
+/**
+ * Implementation of hook_form_alter()
+ */
+function taxonomy_title_form_alter($form_id, &$form){
+  if ($form_id == 'taxonomy_form_term'){
+    $title = _taxonomy_title_get_title($form['tid']['#value']);
+    $form['tax_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Taxonomy Page Title'),
+      '#default_value' => $title,
+      '#description' => t('This is the title you will see on your taxonomy page.  If left blank, the term name will be used.'),
+      '#weight' => -1,
+      );
+    
+    //print_r($form);exit;
+  }
+}
+
+/**
+ * Implementation of hook_taxonomy()
+ */
+function taxonomy_title_taxonomy($op, $type, $array = NULL) {
+  if ($type == 'term') {
+    switch($op){
+      case 'delete':
+        _taxonomy_title_delete_title($array['tid']);
+      break;
+      case 'update':
+        _taxonomy_title_delete_title($array['tid']);
+        _taxonomy_title_insert_title($array['tid'], $array['tax_title']);
+      break;
+      case 'insert':
+        _taxonomy_title_insert_title($array['tid'], $array['tax_title']);
+      break;
+    }
+  }
+}
+
+function _taxonomy_title_delete_title($tid){
+  db_query('DELETE FROM {taxonomy_title} WHERE tid = %d', $tid);
+}
+
+function _taxonomy_title_insert_title($tid, $title){
+  if ($title != ''){
+    db_query('INSERT INTO {taxonomy_title} VALUES (%d, "%s")', $tid, $title);
+  }
+}
+
+function _taxonomy_title_get_title($tid){
+  $title = db_result(db_query('SELECT title FROM {taxonomy_title} WHERE tid = %d', $tid));
+  return $title;
+}

@@ -1,0 +1,20 @@
+<?php // $Id$
+
+function taxonomy_title_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {taxonomy_title} (
+        tid int(11) NOT NULL default '0',
+        title varchar(255) NOT NULL default '',
+        PRIMARY KEY  (tid)
+        ) /*!40100 DEFAULT CHARSET=utf8 */;"
+      );
+      drupal_set_message('Taxonomy Title Table created sucessfully');
+      break;
+  }
+}
+
+function taxonomy_title_uninstall() {
+  db_query('DROP TABLE {taxonomy_title}');
+}

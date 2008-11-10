@@ -1,0 +1,4 @@
+; $Id$
+name = Taxonomy Title
+description = Enables control over the txonomy page titles
+dependencies = taxonomy
