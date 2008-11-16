@@ -21,7 +21,7 @@ function taxonomy_title_form_alter($form_id, &$form){
     $title = _taxonomy_title_get_title($form['tid']['#value']);
     $form['tax_title'] = array(
       '#type' => 'textfield',
-      '#title' => t('Taxonomy Page Title'),
+      '#title' => t('Taxonomy Page - Title'),
       '#default_value' => $title,
       '#description' => t('This is the title you will see on your taxonomy page.  If left blank, the term name will be used.'),
       '#weight' => -1,
