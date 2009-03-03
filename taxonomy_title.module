@@ -4,7 +4,7 @@
 /**
  * Implementation of hook_help()
  */
-function taxonomy_title_help($section = '') {
+function taxonomy_title_help($path, $arg) {
   switch ($section) {
     case 'admin/content/taxonomy':
       return t('<p>Set the page title on your Taxonomy pages.</p>');
@@ -16,18 +16,17 @@ function taxonomy_title_help($section = '') {
 /**
  * Implementation of hook_form_alter()
  */
-function taxonomy_title_form_alter($form_id, &$form){
+function taxonomy_title_form_alter(&$form, &$form_state, $form_id){
   if ($form_id == 'taxonomy_form_term'){
     $title = _taxonomy_title_get_title($form['tid']['#value']);
-    $form['tax_title'] = array(
+    $form['identification']['tax_title'] = array(
       '#type' => 'textfield',
-      '#title' => t('Taxonomy Page - Title'),
+      '#title' => t('Taxonomy Page Title'),
       '#default_value' => $title,
       '#description' => t('This is the title you will see on your taxonomy page.  If left blank, the term name will be used.'),
-      '#weight' => -1,
+      '#weight' => 0,
       );
     
-    //print_r($form);exit;
   }
 }
 
@@ -65,3 +64,24 @@ function _taxonomy_title_get_title($tid){
   $title = db_result(db_query('SELECT title FROM {taxonomy_title} WHERE tid = %d', $tid));
   return $title;
 }
+
+/* 
+ * Implementtion of hook_preprocess
+ * overrides variables sent to template_preprocess_page
+ */
+function taxonomy_title_preprocess(&$variables) {
+  if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
+    $newtitle = _taxonomy_title_get_title(arg(2));
+    if ($newtitle){
+      // sets the meta title
+      drupal_set_title($title);
+      // assures the heading is also set
+      $variables['title'] = $newtitle;
+    }
+  }
+}
+
+
+
+
+

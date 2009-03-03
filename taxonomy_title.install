@@ -1,20 +1,43 @@
 <?php // $Id$
 
+/**
+* Implementation of hook_install().
+*/
 function taxonomy_title_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {taxonomy_title} (
-        tid int(11) NOT NULL default '0',
-        title varchar(255) NOT NULL default '',
-        PRIMARY KEY  (tid)
-        ) /*!40100 DEFAULT CHARSET=utf8 */;"
-      );
-      drupal_set_message('Taxonomy Title Table created sucessfully');
-      break;
-  }
+  // Create tables.
+  drupal_install_schema('taxonomy_title');
 }
 
+/**
+* Implementation of hook_uninstall().
+*/
 function taxonomy_title_uninstall() {
-  db_query('DROP TABLE {taxonomy_title}');
+  // Remove tables.
+  drupal_uninstall_schema('taxonomy_title');
+}
+
+/**
+* Implementation of hook_schema().
+*/
+function taxonomy_title_schema() {
+  $schema = array();
+
+  $schema['taxonomy_title'] = array(
+  'description' => 'Records separate titles/headings for taxonomy term pages',
+    'fields' => array(
+      'tid'       => array(
+        'type' => 'int',
+        'length' => '11', 
+        'unsigned' => TRUE, 
+        'default' => 0, 
+        'not null' => TRUE),
+      'title' => array(
+        'type' => 'varchar',     
+        'length' => '255',                     
+        'default' => '', 
+        'not null' => TRUE ),  
+    ),
+    'primary key' => array('tid'),
+  );
+  return $schema;
 }

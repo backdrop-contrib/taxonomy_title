@@ -15,11 +15,6 @@ Installation Instructions:
 - visit /admin/build/modules and enable taxonomy title
 
 
-Requires:
---------
- - Drupal 5.x
-
-
 Credits:
 --------
  - Written by Jennifer Lea Lampton (http://drupal.org/user/85586)
