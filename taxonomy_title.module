@@ -66,20 +66,19 @@ function _taxonomy_title_get_title($tid){
 
 /* 
  * Implementtion of hook_preprocess
- * overrides variables sent to template_preprocess_page
+ * overrides variables sent to template_preprocess
  */
 function taxonomy_title_preprocess(&$variables, $hook) {
-  if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
-    $tax_title = _taxonomy_title_get_title(arg(2));
-    if ($tax_title){
-      // sets the meta title
-      drupal_set_title($tax_title);
-      // assures the page heading is also set
-      $variables['title'] = $tax_title;
+  if ($hook == 'page' && arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
+    $title = _taxonomy_title_get_title(arg(2));
+    if ($title){
+      // Sets the meta title.
+      drupal_set_title($title);
+      // Assures the page heading is set.
+      $variables['title'] = drupal_get_title();
     }
   }
 }
-
 
 
 
