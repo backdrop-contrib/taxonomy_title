@@ -26,7 +26,6 @@ function taxonomy_title_form_alter(&$form, &$form_state, $form_id){
       '#description' => t('This is the title you will see on your taxonomy page.  If left blank, the term name will be used.'),
       '#weight' => 0,
       );
-    
   }
 }
 
@@ -69,14 +68,14 @@ function _taxonomy_title_get_title($tid){
  * Implementtion of hook_preprocess
  * overrides variables sent to template_preprocess_page
  */
-function taxonomy_title_preprocess(&$variables) {
+function taxonomy_title_preprocess(&$variables, $hook) {
   if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
-    $newtitle = _taxonomy_title_get_title(arg(2));
-    if ($newtitle){
+    $tax_title = _taxonomy_title_get_title(arg(2));
+    if ($tax_title){
       // sets the meta title
-      drupal_set_title($title);
-      // assures the heading is also set
-      $variables['title'] = $newtitle;
+      drupal_set_title($tax_title);
+      // assures the page heading is also set
+      $variables['title'] = $tax_title;
     }
   }
 }
