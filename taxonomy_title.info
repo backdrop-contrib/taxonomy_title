@@ -1,5 +1,5 @@
 ; $Id$
 name = Taxonomy Title
-description = Enables control over the taxonomy page titles
+description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
 core = 6.x
