@@ -7,9 +7,9 @@
 function taxonomy_title_help($path, $arg) {
   switch ($path) {
     case 'admin/content/taxonomy':
-      return '<p>' . t('Set the page title on your Taxonomy pages.') . '</p>';
+      return '<p>' . t('Set the page title on your Taxonomy Term pages.') . '</p>';
     case 'admin/help#quiz':
-      return '<p>' . t('Set the page title on your Taxonomy pages.') . '</p>';
+      return '<p>' . t('Set the page title on your Taxonomy Term pages.') . '</p>';
   }
 }
 
@@ -17,14 +17,16 @@ function taxonomy_title_help($path, $arg) {
  * Implementation of hook_form_FORM_ID_alter().
  */
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
-  $title = _taxonomy_title_get_title($form['tid']['#value']);
-  $form['identification']['taxonomy_title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Taxonomy Page Title'),
-    '#default_value' => $title,
-    '#description' => t('This is the title you will see on your taxonomy page.  If left blank, the term name will be used.'),
-    '#weight' => 0,
-    );
+  if (!(isset($_POST['op']) && $_POST['op'] == t('Delete')) || isset($_POST['confirm'])) {
+    $title = _taxonomy_title_get_title($form['tid']['#value']);
+    $form['identification']['taxonomy_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Taxonomy Page Title'),
+      '#default_value' => $title,
+      '#description' => t('This is the title you will see on your taxonomy term page.  If left blank, the term name will be used.'),
+      '#weight' => 0,
+      );
+  }
 }
 
 /**
@@ -77,7 +79,7 @@ function taxonomy_title_preprocess_page(&$variables) {
 */
 function taxonomy_title_token_list($type = 'all') {
   if ($type == 'taxonomy' || $type == 'all') {
-    $tokens['taxonomy']['term-title'] = t("The term's title, defaults to taxonomy name (same as [term]).");
+    $tokens['taxonomy']['term-title'] = t("The term's title, defaults to term name (same as [term]).");
     return $tokens;
   }
 }
@@ -91,8 +93,8 @@ function taxonomy_title_token_values($type, $object = NULL, $options = array()) 
       $category = $object;
      
       // use taxonomy title if it exists, else category name
-      $token = check_plain(_taxonomy_title_get_title($category->tid));
-      $values['term-title'] = ($token) ? $token : check_plain($category->name);
+      $token = _taxonomy_title_get_title($category->tid);
+      $values['term-title'] = ($token) ? $token : $category->name;
 
       break;
   }
