@@ -90,13 +90,10 @@ function taxonomy_title_token_list($type = 'all') {
 function taxonomy_title_token_values($type, $object = NULL, $options = array()) {
   $values = array();
   if ($type == 'taxonomy') {
-      $category = $object;
-     
+      $category = $object;     
       // use taxonomy title if it exists, else category name
       $token = _taxonomy_title_get_title($category->tid);
       $values['term-title'] = ($token) ? $token : $category->name;
-
-      break;
   }
   return $values;
 }
