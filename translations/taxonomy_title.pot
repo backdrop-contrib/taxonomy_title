@@ -1,0 +1,49 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  taxonomy_title.module,v 1.8 2009/12/19 05:06:49 jenlampton
+#  taxonomy_title.info,v 1.3 2009/12/18 22:15:58 jenlampton
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2009-12-20 01:03+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: taxonomy_title.module:10;12
+msgid "Set the page title on your Taxonomy Term pages."
+msgstr ""
+
+#: taxonomy_title.module:20
+msgid "Delete"
+msgstr ""
+
+#: taxonomy_title.module:24
+msgid "Taxonomy Page Title"
+msgstr ""
+
+#: taxonomy_title.module:26
+msgid "This is the title you will see on your taxonomy term page.  If left blank, the term name will be used."
+msgstr ""
+
+#: taxonomy_title.module:82
+msgid "The term's title, defaults to term name (same as [term])."
+msgstr ""
+
+#: taxonomy_title.info:0
+msgid "Taxonomy Title"
+msgstr ""
+
+#: taxonomy_title.info:0
+msgid "Enables control over the taxonomy page titles."
+msgstr ""
+
