@@ -3,14 +3,14 @@
 # LANGUAGE translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 # Generated from files:
-#  taxonomy_title.module,v 1.8 2009/12/19 05:06:49 jenlampton
-#  taxonomy_title.info,v 1.3 2009/12/18 22:15:58 jenlampton
+#  taxonomy_title.module,v 1.9 2009/12/25 21:15:20 jenlampton
+#  taxonomy_title.info,v 1.4 2009/12/25 21:15:20 jenlampton
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2009-12-20 01:03+0100\n"
+"POT-Creation-Date: 2009-12-26 13:21+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -28,19 +28,19 @@ msgid "Delete"
 msgstr ""
 
 #: taxonomy_title.module:24
-msgid "Taxonomy Page Title"
+msgid "Term page title"
 msgstr ""
 
 #: taxonomy_title.module:26
-msgid "This is the title you will see on your taxonomy term page.  If left blank, the term name will be used."
+msgid "This is the title you will see on your taxonomy term page. If left blank, the term name will be used."
 msgstr ""
 
-#: taxonomy_title.module:82
+#: taxonomy_title.module:84
 msgid "The term's title, defaults to term name (same as [term])."
 msgstr ""
 
 #: taxonomy_title.info:0
-msgid "Taxonomy Title"
+msgid "Taxonomy title"
 msgstr ""
 
 #: taxonomy_title.info:0
