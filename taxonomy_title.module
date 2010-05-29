@@ -59,18 +59,28 @@ function taxonomy_title_taxonomy($op, $type, $array = NULL) {
 function taxonomy_title_preprocess_page(&$variables) {
   if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
     $title = _taxonomy_title_get_title(arg(2));
-    if (!empty($title)){
-      drupal_set_title($title);
+  }
+  
+  // Add support for Ubercart catalog too.
+  if (module_exists('ubercart') && arg(0) == 'catalog') {
+		$tids = explode(' ', arg(1));
+		if (is_numeric($tids[0]) && $tids[0] > 0) {
+			$tid = $tids[0];
+			$title = _taxonomy_title_get_title($tid);
+		}
+	}
+  
+  if (!empty($title)){
+    drupal_set_title($title);
 
-      if ($new_title = drupal_get_title()) {
-        // Assures the page heading is set.
-        $variables['title'] = $new_title;
+    if ($new_title = drupal_get_title()) {
+      // Assures the page heading is set.
+      $variables['title'] = $new_title;
 
-        // Sets the meta title.
-        if (!module_exists('page_title')){
-          $head_title = array(strip_tags($new_title), variable_get('site_name', 'Drupal'));
-          $variables['head_title'] = implode(' | ', $head_title);
-        }
+      // Sets the meta title.
+      if (!module_exists('page_title')){
+        $head_title = array(strip_tags($new_title), variable_get('site_name', 'Drupal'));
+        $variables['head_title'] = implode(' | ', $head_title);
       }
     }
   }
