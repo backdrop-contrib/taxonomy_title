@@ -62,7 +62,7 @@ function taxonomy_title_preprocess_page(&$variables) {
   }
   
   // Add support for Ubercart catalog too.
-  if (module_exists('ubercart') && arg(0) == 'catalog') {
+  if (module_exists('uc_catalog') && arg(0) == 'catalog') {
 		$tids = explode(' ', arg(1));
 		if (is_numeric($tids[0]) && $tids[0] > 0) {
 			$tid = $tids[0];
