@@ -1,4 +1,3 @@
-; $Id$
 name = Taxonomy title
 description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
