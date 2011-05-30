@@ -1,4 +1,8 @@
 <?php 
+/**
+ * @file
+ * Database set up and clean-up for taxonomy title module.
+ */
 
 /**
  * Implementation of hook_install().
@@ -14,6 +18,8 @@ function taxonomy_title_install() {
 function taxonomy_title_uninstall() {
   // Remove tables.
   drupal_uninstall_schema('taxonomy_title');
+  variable_del('taxonomy_title_headings');
+  variable_del('taxonomy_title_page_titles');
 }
 
 /**

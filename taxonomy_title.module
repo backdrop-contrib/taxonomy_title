@@ -14,7 +14,7 @@
  */
 function taxonomy_title_menu(){
   $items['admin/settings/taxonomy_title'] = array(
-    'title' => 'Taxonomy title settings', 
+    'title' => 'Taxonomy title', 
     'description' => 'Settings for the taxonomy title module.', 
     'page callback' => 'drupal_get_form',
     'page arguments' => array('taxonomy_title_admin_settings'),
@@ -26,7 +26,6 @@ function taxonomy_title_menu(){
   
   return $items;
 }
-
 
 /**
  * Implementation of hook_form_FORM_ID_alter().
@@ -72,7 +71,7 @@ function taxonomy_title_taxonomy($op, $type, $array = NULL) {
 /**
  * Implementation of hook_preprocess_page().
  *
- * Overrides variables sent to template_preprocess.
+ * Overrides title and head_title variables sent to template_preprocess.
  */
 function taxonomy_title_preprocess_page(&$variables) {
   // Get the tid depending on the path.
@@ -117,7 +116,20 @@ function taxonomy_title_preprocess_page(&$variables) {
 } 
 
 /**
- * Adds the term title.
+ * Retrieves the term title.
+ *
+ * @param $tid
+ *   The taxonomy term id of the term to delete.
+ * @return
+ *   The taxonomy term title for the term.
+ */
+function _taxonomy_title_get($tid) {
+  $title = db_result(db_query("SELECT title FROM {taxonomy_title} WHERE tid = %d", $tid));
+  return taxonomy_title_tt("taxonomy_title:term:$tid:title", $title);
+}
+
+/**
+ * Inserts the term title.
  *
  * @param $tid
  *   The taxonomy term id of the term.
@@ -169,18 +181,28 @@ function _taxonomy_title_delete($tid) {
 }
 
 /**
- * Retrieves the term title.
- *
- * @param $tid
- *   The taxonomy term id of the term to delete.
- * @return
- *   The taxonomy term title for the term.
+ * Helper function: sets all default usage to ON.
  */
-function _taxonomy_title_get($tid) {
-  $title = db_result(db_query("SELECT title FROM {taxonomy_title} WHERE tid = %d", $tid));
-  return taxonomy_title_tt("taxonomy_title:term:$tid:title", $title);
+function taxonomy_title_get_settings() {
+  $vocabs = taxonomy_get_vocabularies();
+  
+  $heading_defaults = variable_get('taxonomy_title_headings', array());
+  $page_title_defaults = variable_get('taxonomy_title_page_titles', array());
+  
+  foreach ($vocabs as $vid => $vocab) {
+    if (!isset($heading_defaults[$vid])) {
+      $heading_defaults[$vid] = $vid;
+    }
+    if (!isset($page_title_defaults[$vid])) {
+      $page_title_defaults[$vid] = $vid;
+    }
+  }
+  
+  $settings = array('taxonomy_title_headings' => $heading_defaults, 'taxonomy_title_page_titles' => $page_title_defaults);
+  
+  return $settings;
 }
-
+ 
 /**
  * Translate user defined string. Wrapper function for tt() if i18nstrings enabled.
  * 
@@ -222,6 +244,7 @@ function taxonomy_title_locale_refresh() {
 function taxonomy_title_token_list($type = 'all') {
   if ($type == 'taxonomy' || $type == 'all') {
     $tokens['taxonomy']['term-title'] = t("The term's title, defaults to term name (same as [term]).");
+    $tokens['taxonomy']['term-title-raw'] = t("The raw component of the term's title, WARNING - raw user input.");
     return $tokens;
   }
 }
@@ -234,29 +257,22 @@ function taxonomy_title_token_values($type, $object = NULL, $options = array()) 
   if ($type == 'taxonomy') {
       $category = $object;
       // Use taxonomy title if it exists, else the category name.
-      $token = _taxonomy_title_get($category->tid);
-      $values['term-title'] = ($token) ? $token : $category->name;
+      $title = _taxonomy_title_get($category->tid);
+      $values['term-title'] = ($title) ? check_plain($title) : check_plain($category->name);
+      $values['term-title-raw'] = ($title) ? $title : $category->name;
   }
   return $values;
 }
 
 /**
- * Helper function, sets all default settings to true.
+ * Implements hook_theme().
  */
-function taxonomy_title_get_settings() {
-  $vocabs = taxonomy_get_vocabularies();
-  
-  $heading_defaults = variable_get('taxonomy_title_headings', array());
-  $page_title_defaults = variable_get('taxonomy_title_page_titles', array());
-  
-  foreach ($vocabs as $vid => $vocab) {
-    if (!isset($heading_defaults[$vid])) {
-      $heading_defaults[$vid] = $vid;
-    }
-    if (!isset($page_title_defaults[$vid])) {
-      $page_title_defaults[$vid] = $vid;
-    }
-  }
-  
-  return array('taxonomy_title_headings' => $heading_defaults, 'taxonomy_title_page_titles' => $page_title_defaults);
+function taxonomy_title_theme() {
+  $theme = array(
+    'taxonomy_title_admin_settings' => array(
+      'arguments' => array('form' => NULL),
+      'file' => 'taxonomy_title.admin.inc',
+    ),
+  );
+  return $theme;
 }
