@@ -38,13 +38,17 @@ function taxonomy_title_taxonomy($op, $type, $array = NULL) {
         _taxonomy_title_delete($array['tid']);
         break;
 
-      case 'update':
-        _taxonomy_title_update($array['tid'], $array['taxonomy_title']); 
-        break;
+        case 'update':
+          if (isset($array['taxonomy_title'])) {
+            _taxonomy_title_update($array['tid'], $array['taxonomy_title']);  
+          }
+          break;
 
-      case 'insert':
-        _taxonomy_title_insert($array['tid'], $array['taxonomy_title']);
-        break;
+        case 'insert':
+          if (isset($array['taxonomy_title'])) {
+            _taxonomy_title_insert($array['tid'], $array['taxonomy_title']);
+          }
+          break;
     }
   }
 }
