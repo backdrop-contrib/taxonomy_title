@@ -6,9 +6,9 @@
 function taxonomy_title_help($path, $arg) {
   switch ($path) {
     case 'admin/content/taxonomy':
-      return '<p>' . t('Set the page title on your Taxonomy Term pages.') . '</p>';
-    case 'admin/help#quiz':
-      return '<p>' . t('Set the page title on your Taxonomy Term pages.') . '</p>';
+      return '<p>' . t('Set the page heading on your Taxonomy Term pages.') . '</p>';
+    case 'admin/help#taxonomy':
+      return '<p>' . t('Set the page heading on your Taxonomy Term pages.') . '</p>';
   }
 }
 
@@ -17,12 +17,12 @@ function taxonomy_title_help($path, $arg) {
  */
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
   if (!(isset($_POST['op']) && $_POST['op'] == t('Delete')) || isset($_POST['confirm'])) {
-    $title = _taxonomy_title_get_title($form['tid']['#value']);
+    $title = _taxonomy_title_get($form['tid']['#value']);
     $form['identification']['taxonomy_title'] = array(
       '#type' => 'textfield',
-      '#title' => t('Term page title'),
+      '#title' => t('Term page heading'),
       '#default_value' => $title,
-      '#description' => t('This is the title you will see on your taxonomy term page. If left blank, the term name will be used.'),
+      '#description' => t('This is the title you will see in the heading tag on your taxonomy term page. If left blank, the term name will be used.'),
       '#weight' => 0,
       );
   }
@@ -35,16 +35,15 @@ function taxonomy_title_taxonomy($op, $type, $array = NULL) {
   if ($type == 'term') {
     switch($op) {
       case 'delete':
-        _taxonomy_title_delete_title($array['tid']);
+        _taxonomy_title_delete($array['tid']);
         break;
 
       case 'update':
-        _taxonomy_title_delete_title($array['tid']);
-        _taxonomy_title_insert_title($array['tid'], $array['taxonomy_title']);
+        _taxonomy_title_update($array['tid'], $array['taxonomy_title']); 
         break;
 
       case 'insert':
-        _taxonomy_title_insert_title($array['tid'], $array['taxonomy_title']);
+        _taxonomy_title_insert($array['tid'], $array['taxonomy_title']);
         break;
     }
   }
@@ -57,7 +56,7 @@ function taxonomy_title_taxonomy($op, $type, $array = NULL) {
  */
 function taxonomy_title_preprocess_page(&$variables) {
   if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
-    $title = _taxonomy_title_get_title(arg(2));
+    $title = _taxonomy_title_get(arg(2));
   }
   
   // Add support for Ubercart catalog too.
@@ -65,7 +64,7 @@ function taxonomy_title_preprocess_page(&$variables) {
 		$tids = explode(' ', arg(1));
 		if (is_numeric($tids[0]) && $tids[0] > 0) {
 			$tid = $tids[0];
-			$title = _taxonomy_title_get_title($tid);
+			$title = _taxonomy_title_get($tid);
 		}
 	}
   
@@ -86,30 +85,6 @@ function taxonomy_title_preprocess_page(&$variables) {
 }
 
 /**
-* Implementation of hook_token_list().
-*/
-function taxonomy_title_token_list($type = 'all') {
-  if ($type == 'taxonomy' || $type == 'all') {
-    $tokens['taxonomy']['term-title'] = t("The term's title, defaults to term name (same as [term]).");
-    return $tokens;
-  }
-}
-
-/**
-* Implementation of hook_token_values().
-*/
-function taxonomy_title_token_values($type, $object = NULL, $options = array()) {
-  $values = array();
-  if ($type == 'taxonomy') {
-      $category = $object;
-      // Use taxonomy title if it exists, else the category name.
-      $token = _taxonomy_title_get_title($category->tid);
-      $values['term-title'] = ($token) ? $token : $category->name;
-  }
-  return $values;
-}
-
-/**
  * Adds the term title.
  *
  * @param $tid
@@ -117,9 +92,29 @@ function taxonomy_title_token_values($type, $object = NULL, $options = array()) 
  * @param $title
  *   The taxonomy term title to use for this term.
  */
-function _taxonomy_title_insert_title($tid, $title){
+function _taxonomy_title_insert($tid, $title) {
   if (!empty($title)) {
     db_query("INSERT INTO {taxonomy_title} (tid, title) VALUES (%d, '%s')", $tid, $title);
+    if (function_exists('i18nstrings_update')) {
+      i18nstrings_update("taxonomy_title:term:$tid:title", $title);
+    }
+  }
+}
+
+/**
+ * Updates the term title.
+ *
+ * @param $tid
+ *   The taxonomy term id of the term.
+ * @param $title
+ *   The taxonomy term title to use for this term.
+ */
+function _taxonomy_title_update($tid, $title) {
+  db_query("UPDATE {taxonomy_title} SET title = '%s' WHERE tid = %d", $title, $tid);
+  // Add Suppot for i18nstrings.
+  if (function_exists('i18nstrings_update')) {
+      drupal_set_message('gotcha');
+    i18nstrings_update("taxonomy_title:term:$tid:title", $title);
   }
 }
 
@@ -129,8 +124,12 @@ function _taxonomy_title_insert_title($tid, $title){
  * @param $tid
  *   The taxonomy term id of the term to delete.
  */
-function _taxonomy_title_delete_title($tid){
+function _taxonomy_title_delete($tid) {
   db_query("DELETE FROM {taxonomy_title} WHERE tid = %d", $tid);
+  // Add Suppot for i18nstrings.
+  if (function_exists('i18nstrings_remove')) {
+    i18nstrings_remove($name);
+  }
 }
 
 /**
@@ -141,7 +140,66 @@ function _taxonomy_title_delete_title($tid){
  * @return
  *   The taxonomy term title for the term.
  */
-function _taxonomy_title_get_title($tid){
+function _taxonomy_title_get($tid) {
   $title = db_result(db_query("SELECT title FROM {taxonomy_title} WHERE tid = %d", $tid));
-  return $title;
+  return taxonomy_title_tt("taxonomy_title:term:$tid:title", $title);
+}
+
+/**
+ * Translate user defined string. Wrapper function for tt() if i18nstrings enabled.
+ * 
+ * @param $name
+ *   String id in the form taxonomy_title:term:[tid]:title
+ */
+function taxonomy_title_tt($name, $string, $langcode = NULL) {
+  return function_exists('i18nstrings') ? i18nstrings($name, $string, $langcode) : $string;
+}
+
+/**
+ * Implementation of hook_locale().
+ */
+function taxonomy_title_locale($op = 'groups', $group = NULL) {
+  switch ($op) {
+    case 'groups':
+      return array('taxonomy_title' => t('Taxonomy title'));
+    case 'info':
+      $info['taxonomy_title']['refresh callback'] = 'taxonomy_title_locale_refresh';
+      return $info;
+  }
+}
+
+/**
+ * Refresh callback for locale strings.
+ */
+function taxonomy_title_locale_refresh() {
+  $results = db_query("SELECT tid, title FROM {taxonomy_title}");
+  while ($row = db_fetch_object($results)) {
+    i18nstrings_update("taxonomy_title:term:$row->tid:title", $row->title);
+  }
+  // Meaning it completed with no issues. @see i18nmenu_locale_refresh().
+  return TRUE;
+}
+
+/**
+ * Implementation of hook_token_list().
+ */
+function taxonomy_title_token_list($type = 'all') {
+  if ($type == 'taxonomy' || $type == 'all') {
+    $tokens['taxonomy']['term-title'] = t("The term's title, defaults to term name (same as [term]).");
+    return $tokens;
+  }
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function taxonomy_title_token_values($type, $object = NULL, $options = array()) {
+  $values = array();
+  if ($type == 'taxonomy') {
+      $category = $object;
+      // Use taxonomy title if it exists, else the category name.
+      $token = _taxonomy_title_get($category->tid);
+      $values['term-title'] = ($token) ? $token : $category->name;
+  }
+  return $values;
 }
