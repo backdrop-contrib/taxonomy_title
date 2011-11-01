@@ -5,25 +5,16 @@
  */
 
 /**
- * Implementation of hook_install().
- */
-function taxonomy_title_install() {
-  // Create tables.
-  drupal_install_schema('taxonomy_title');
-}
-
-/**
  * Implementation of hook_uninstall().
  */
 function taxonomy_title_uninstall() {
-  // Remove tables.
-  drupal_uninstall_schema('taxonomy_title');
+  // Remove additional variables.
   variable_del('taxonomy_title_headings');
   variable_del('taxonomy_title_page_titles');
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function taxonomy_title_schema() {
   $schema['taxonomy_title'] = array(
@@ -41,10 +32,10 @@ function taxonomy_title_schema() {
         'length' => '255',
         'default' => '',
         'not null' => TRUE,
-      ),  
+      ),
     ),
     'primary key' => array('tid'),
   );
-  
+
   return $schema;
 }

@@ -1,4 +1,4 @@
 name = Taxonomy title
 description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
-core = 6.x
+core = 7.x

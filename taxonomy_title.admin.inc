@@ -29,7 +29,7 @@ function taxonomy_title_admin_settings(){
       $page_title_defaults[$vid] = $vid;
     }
   }
-  
+
   $form['settings'] = array(
     '#theme' => 'taxonomy_title_admin_settings',
   );
@@ -63,44 +63,4 @@ function taxonomy_title_admin_settings(){
   }
   
   return system_settings_form($form);
-}
-
-/**
- * Theme function for admin form, turns into a table
- */
-function theme_taxonomy_title_admin_settings($form) {
-  if (!module_exists('page_title')) {
-    $title_head = t('Affect Title tag');
-  } 
-  else {
-    $title_head = t('Affect Title tag*');
-  }
-  
-  $header = array(
-    t('Terms in vocabulary'), 
-    array('data' => t('Affect Heading tag'), 'class' => 'checkbox'), 
-    array('data' => $title_head, 'class' => 'checkbox'),
-  );
-  
-  $rows = array();
-  foreach($form['taxonomy_title_page_titles']['#options'] as $vid => $name) {
-    $row = array();
-    $row[] = check_plain($name);
-    unset($form['taxonomy_title_headings'][$vid]['#title']);
-    $row[] = array('data' => drupal_render($form['taxonomy_title_headings'][$vid]), 'class' => 'checkbox');
-    unset($form['taxonomy_title_page_titles'][$vid]['#title']);
-    $row[] = array('data' => drupal_render($form['taxonomy_title_page_titles'][$vid]), 'class' => 'checkbox');
-    $rows[] = $row;
-  }
-  // Add a row with screenshots.
-  $heading_example = theme('image', drupal_get_path('module', 'taxonomy_title') . '/includes/' . 'heading.png');
-  $title_example = theme('image', drupal_get_path('module', 'taxonomy_title') . '/includes/' . 'title.png');
-  $rows[] = array(t('Example'), array('data' => $heading_example, 'class' => 'checkbox'), array('data' => $title_example, 'class' => 'checkbox'));
-  // Create the table inside the form.
-  $form['settings']['table'] = array(
-    '#value' => theme('table', $header, $rows),
-    '#weight' => 1,
-  );
-
-  return drupal_render($form);
 }
