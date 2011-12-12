@@ -54,8 +54,7 @@ function taxonomy_title_taxonomy_term_delete($op, $type, $array = NULL) {
  * Implements hook_taxonomy_term_update().
  */
 function taxonomy_title_taxonomy_term_update($term) {
-  _taxonomy_title_delete_title($term->tid);
-  _taxonomy_title_insert_title($term->tid, $term->taxonomy_title);
+  _taxonomy_title_update($term->tid, $term->taxonomy_title);
 }
 
 /**
@@ -121,6 +120,7 @@ function taxonomy_title_process_page(&$variables) {
  */
 function _taxonomy_title_get_title($tid) {
   $title = db_query("SELECT title FROM {taxonomy_title} WHERE tid = :tid", array(':tid' => $tid))->fetchField();
+
   return $title;
 }
 
@@ -152,12 +152,15 @@ function _taxonomy_title_insert_title($tid, $title) {
  *   The taxonomy term title to use for this term.
  */
 function _taxonomy_title_update($tid, $title) {
-  if (db_result(db_query("SELECT title FROM {taxonomy_title} WHERE tid = %d", $tid))) {
-    db_query("UPDATE {taxonomy_title} SET title = '%s' WHERE tid = %d", $title, $tid);     
-  }
-  else {
-    db_query("INSERT INTO {taxonomy_title} (tid, title) VALUES (%d, '%s')", $tid, $title);
-  }
+  db_merge('taxonomy_title')
+    ->key(array(
+      'tid'=>$tid
+    ))
+    ->fields(array(
+      'title' => $title
+    ))
+    ->execute();
+
   // Add Suppot for i18nstrings.
   if (function_exists('i18nstrings_update')) {
     i18nstrings_update("taxonomy_title:term:$tid:title", $title);
@@ -181,10 +184,10 @@ function _taxonomy_title_delete_title($tid) {
  */
 function taxonomy_title_get_settings() {
   $vocabs = taxonomy_get_vocabularies();
-  
+
   $heading_defaults = variable_get('taxonomy_title_headings', array());
   $page_title_defaults = variable_get('taxonomy_title_page_titles', array());
-  
+
   foreach ($vocabs as $vid => $vocab) {
     if (!isset($heading_defaults[$vid])) {
       $heading_defaults[$vid] = $vid;
@@ -193,12 +196,12 @@ function taxonomy_title_get_settings() {
       $page_title_defaults[$vid] = $vid;
     }
   }
-  
+
   $settings = array(
     'taxonomy_title_headings' => $heading_defaults, 
     'taxonomy_title_page_titles' => $page_title_defaults,
   );
-  
+
   return $settings;
 }
  
@@ -233,6 +236,7 @@ function taxonomy_title_locale_refresh() {
   while ($row = db_fetch_object($results)) {
     i18nstrings_update("taxonomy_title:term:$row->tid:title", $row->title);
   }
+
   // Meaning it completed with no issues. @see i18nmenu_locale_refresh().
   return TRUE;
 }
@@ -248,6 +252,7 @@ function taxonomy_title_hook_info() {
   $hooks['tokens'] = array(
     'group' => 'tokens',
   );
+
   return $hooks;
 }
 
@@ -261,5 +266,6 @@ function taxonomy_title_theme($existing, $type, $theme, $path) {
       'file' => 'taxonomy_title.theme.inc',
     ),
   );
+
   return $theme;
 }
