@@ -54,14 +54,21 @@ function taxonomy_title_taxonomy_term_delete($op, $type, $array = NULL) {
  * Implements hook_taxonomy_term_update().
  */
 function taxonomy_title_taxonomy_term_update($term) {
-  _taxonomy_title_update($term->tid, $term->taxonomy_title);
+  if (isset($term->taxonomy_title)) {
+    _taxonomy_title_update($term->tid, $term->taxonomy_title);
+  }
+  else {
+    _taxonomy_title_delete_title($term->tid);
+  }
 }
 
 /**
  * Implements hook_taxonomy_term_insert().
  */
 function taxonomy_title_taxonomy_term_insert($term) {
-  _taxonomy_title_insert_title($term->tid, $term->taxonomy_title);
+  if (isset($term->taxonomy_title)) {
+    _taxonomy_title_insert_title($term->tid, $term->taxonomy_title);
+  }
 }
 
 /**
