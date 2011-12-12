@@ -249,21 +249,6 @@ function taxonomy_title_locale_refresh() {
 }
 
 /**
- * Implements hook__hook_info().
- * For the tokens.inc file.
- */
-function taxonomy_title_hook_info() {
-  $hooks['token_info'] = array(
-    'group' => 'tokens',
-  );
-  $hooks['tokens'] = array(
-    'group' => 'tokens',
-  );
-
-  return $hooks;
-}
-
-/**
  * Implements hook_theme().
  */
 function taxonomy_title_theme($existing, $type, $theme, $path) {

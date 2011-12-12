@@ -1,27 +1,47 @@
 <?php
 
 /**
- * Implementation of hook_token_list().
+ * @file
+ * Provides tokens, for use with page_title module.
  */
-function taxonomy_title_token_list($type = 'all') {
-  if ($type == 'taxonomy' || $type == 'all') {
-    $tokens['taxonomy']['term-title'] = t("The term's title, defaults to term name (same as [term]).");
-    $tokens['taxonomy']['term-title-raw'] = t("The raw component of the term's title, WARNING - raw user input.");
-    return $tokens;
-  }
+
+/**
+ * Implements hook_token_info().
+ */
+function taxonomy_title_token_info() {
+  $info['tokens']['term']['title'] = array(
+    'name' => t('Term title'),
+    'description' => t("The term's title, defaults to term name (same as [term:name]) if no title provided."),
+    'needs-data' => 'term',
+  );
+
+  return $info;
 }
 
 /**
- * Implementation of hook_token_values().
+ * Implements hook_tokens().
  */
-function taxonomy_title_token_values($type, $object = NULL, $options = array()) {
-  $values = array();
-  if ($type == 'taxonomy') {
-      $category = $object;
-      // Use taxonomy title if it exists, else the category name.
-      $title = _taxonomy_title_get($category->tid);
-      $values['term-title'] = ($title) ? check_plain($title) : check_plain($category->name);
-      $values['term-title-raw'] = ($title) ? $title : $category->name;
+function taxonomy_title_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
+
+  if ($type == 'term' && !empty($data['term'])) {
+    $term = $data['term'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'title':
+          $title = _taxonomy_title_get_title($term->tid);
+          if ($title) {
+            $replacements[$original] = ($sanitize) ? check_plain($title) : $title;
+          }
+          else {
+            $replacements[$original] = $term->name;
+          }
+          break;
+      }
+    }
   }
-  return $values;
+
+  return $replacements;
 }
