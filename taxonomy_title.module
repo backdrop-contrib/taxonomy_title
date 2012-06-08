@@ -13,7 +13,7 @@
  * Implementation of hook_menu().
  */
 function taxonomy_title_menu(){
-  $items['admin/config/taxonomy_title'] = array(
+  $items['admin/config/search/taxonomy_title'] = array(
     'title' => 'Taxonomy title', 
     'description' => 'Settings for the taxonomy title module.', 
     'page callback' => 'drupal_get_form',
@@ -46,7 +46,7 @@ function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
 /**
  * Implements hook_taxonomy_term_delete().
  */
-function taxonomy_title_taxonomy_term_delete($op, $type, $array = NULL) {
+function taxonomy_title_taxonomy_term_delete($term) {
   _taxonomy_title_delete_title($term->tid);
 }
 
