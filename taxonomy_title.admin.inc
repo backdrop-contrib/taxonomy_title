@@ -40,7 +40,7 @@ function taxonomy_title_admin_settings(){
     '#default_value' => $heading_defaults,
   );
   
-  if (!module_exists('page_title')) {
+  if (!module_exists('page_title') && !module_exists('metatag')) {
     $form['settings']['taxonomy_title_page_titles'] = array(
       '#type' => 'checkboxes',
       '#options' => $page_title_options,
@@ -56,9 +56,11 @@ function taxonomy_title_admin_settings(){
     );
     $form['settings']['notice'] = array(
       '#weight' => 2,
-      '#value' => '<p>' . t('* Since you have the page title module enabled, this module will be unable 
-      to affect the title tags of your pages.  If you would like taxonomy titles to appear in your
-      title tags, please configure the page title module using the provided tokens.  Example: [term-title]') . '</p>',
+      '#markup' => '<p>' . t('* Since you have either the page title module or 
+        the metatag module enabled, this module will be unable to affect the 
+        title tags of your pages.  If you would like taxonomy titles to appear 
+        in your title tags, please configure that module to use the provided 
+        tokens.  Example: [term-title]') . '</p>',
     );
   }
   
