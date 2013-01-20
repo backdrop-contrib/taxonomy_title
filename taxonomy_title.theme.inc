@@ -12,7 +12,6 @@ function theme_taxonomy_title_admin_settings($variables) {
 
   if (!module_exists('page_title') && !module_exists('metatag')) {
     $title_head = t('Affect title tag');
-    dpm('here');
   } 
   else {
     $title_head = t('Affect title tag *');
