@@ -2,3 +2,5 @@ name = Taxonomy title
 description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
 core = 7.x
+
+configure = admin/config/search/taxonomy_title
