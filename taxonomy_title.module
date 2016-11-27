@@ -77,7 +77,7 @@ function taxonomy_title_taxonomy_term_insert($term) {
  * Overrides variables sent to template_preprocess.
  */
 function taxonomy_title_process_page(&$variables) {
-  if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0) {
+  if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0 && !arg(3)) {
     $tid = arg(2);
   }
 
