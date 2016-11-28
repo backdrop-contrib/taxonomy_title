@@ -32,12 +32,16 @@ function taxonomy_title_menu(){
  */
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
   if (!(isset($_POST['op']) && $_POST['op'] == t('Delete')) || isset($_POST['confirm'])) {
-    $title = _taxonomy_title_get_title($form['tid']['#value']);
+    $title = _taxonomy_title_get_title($form['tid']['#value'], FALSE);
+    $alt = 'the term name';
+    if ($global_default = variable_get('taxonomy_title_default_' . $form['#term']['vid'], FALSE)) {
+      $alt = 'the global default pattern of <em>' . token_replace($global_default, array('term' => $form_state['term'])) . '</em>';
+    }
     $form['taxonomy_title'] = array(
       '#type' => 'textfield',
       '#title' => t('Term page heading'),
       '#default_value' => $title,
-      '#description' => t('This is the title you will see in the heading tag on your taxonomy term page. If left blank, the term name will be used.'),
+      '#description' => t('If left blank !alt will be used.', array('!alt' => $alt)),
       '#weight' => -4,
     );
   }
@@ -95,24 +99,32 @@ function taxonomy_title_process_page(&$variables) {
 
     if (!empty($title)){
       $term = taxonomy_term_load($tid);
-      $settings = taxonomy_title_get_settings();
-      $heading_settings = $settings['taxonomy_title_headings'];
-      $page_title_settings = $settings['taxonomy_title_page_titles'];
+      $heading_settings = variable_get('taxonomy_title_headings', array());
+      $page_title_settings = variable_get('taxonomy_title_page_titles', array());
+
+      // If there no setting, assume setting is ON.
+      $affect_heading = (!isset($heading_settings[$term->vid]) || $heading_settings[$term->vid] != 0);
+      $affect_title = (!isset($page_title_settings[$term->vid]) || $page_title_settings[$term->vid] != 0);
+
+      // Set the page heading.
+      if ($affect_heading) {
+        $variables['title'] = $title;
+      }
+
+      // Set the HTML title tag.
+      $site_name = variable_get('site_name', 'Drupal');
+      if ($affect_title && (!module_exists('page_title')) && !module_exists('metatag')){
+        $head_title = array($title, $site_name);
+        $variables['head_title'] = implode(' | ', $head_title);
+      }
+      else {
+        // Unset things, just to be safe.
+        $title = check_plain($term->name);
+        $head_title = array($title, $site_name);
+        $variables['head_title'] = implode(' | ', $head_title);
+      }
 
       drupal_set_title($title);
-      if ($new_title = drupal_get_title()) {
-
-        // Assure the page title (heading) is set.
-        if ($heading_settings[$term->vid] != 0) {
-          $variables['title'] = $new_title;
-        }
-
-        // Set the HTML title tag.
-        if (($page_title_settings[$term->vid] != 0) && (!module_exists('page_title'))){
-          $head_title = array(strip_tags($new_title), variable_get('site_name', 'Drupal'));
-          $variables['head_title'] = implode(' | ', $head_title);
-        }
-      }
     }
   }
 }
@@ -120,13 +132,22 @@ function taxonomy_title_process_page(&$variables) {
 /**
  * Retrieves the term title.
  *
- * @param $tid
+ * @param (int) $tid
  *   The taxonomy term id of the term to delete.
- * @return
+ * @param (bool) $default
+ *   Whether to return a global default value if no specific value is provided.
+ *
+ * @return (string)
  *   The taxonomy term title for the term.
  */
-function _taxonomy_title_get_title($tid) {
+function _taxonomy_title_get_title($tid, $default = TRUE) {
   $title = db_query("SELECT title FROM {taxonomy_title} WHERE tid = :tid", array(':tid' => $tid))->fetchField();
+  if ($title == FALSE && $default == TRUE) {
+    // Check for global default value.
+    $term = taxonomy_term_load($tid);
+    $default = variable_get('taxonomy_title_default_' . $term->vid, '');
+    $title = token_replace($default, array('term' => $term));
+  }
   if (function_exists('i18n_string_translate')) {
     $title = i18n_string_translate(array('taxonomy_title', 'term', $tid, 'title'), $title, array('sanitize' => FALSE));
   }
@@ -192,32 +213,6 @@ function _taxonomy_title_delete_title($tid) {
   db_delete('taxonomy_title')
     ->condition('tid', $tid)
     ->execute();
-}
-
-/**
- * Helper function: sets all default usage to ON.
- */
-function taxonomy_title_get_settings() {
-  $vocabs = taxonomy_get_vocabularies();
-
-  $heading_defaults = variable_get('taxonomy_title_headings', array());
-  $page_title_defaults = variable_get('taxonomy_title_page_titles', array());
-
-  foreach ($vocabs as $vid => $vocab) {
-    if (!isset($heading_defaults[$vid])) {
-      $heading_defaults[$vid] = $vid;
-    }
-    if (!isset($page_title_defaults[$vid])) {
-      $page_title_defaults[$vid] = $vid;
-    }
-  }
-
-  $settings = array(
-    'taxonomy_title_headings' => $heading_defaults,
-    'taxonomy_title_page_titles' => $page_title_defaults,
-  );
-
-  return $settings;
 }
 
 /**
