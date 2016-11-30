@@ -39,11 +39,11 @@ function theme_taxonomy_title_admin_settings($variables) {
   }
 
   // Add a row with screenshots.
-  $heading_path = backdrop_get_path('module', 'taxonomy_title') . '/includes/' . 'heading.png';
-  $heading_example = theme('image', array('path' => $heading_path));
+  $heading_path = backdrop_get_path('module', 'taxonomy_title') . '/images/' . 'heading.png';
+  $heading_example = theme('image', array('uri' => $heading_path));
 
-  $title_path = backdrop_get_path('module', 'taxonomy_title') . '/includes/' . 'title.png';
-  $title_example = theme('image', array('path' => $title_path));
+  $title_path = backdrop_get_path('module', 'taxonomy_title') . '/images/' . 'title.png';
+  $title_example = theme('image', array('uri' => $title_path));
 
   $rows[] = array(
     t('Example'),
