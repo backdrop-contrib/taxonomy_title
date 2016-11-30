@@ -40,19 +40,17 @@ function taxonomy_title_theme($existing, $type, $theme, $path) {
  * Implements hook_form_FORM_ID_alter().
  */
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
-  if (!(isset($_POST['op']) && $_POST['op'] == t('Delete')) || isset($_POST['confirm'])) {
-    $title = taxonomy_title_get($form['tid']['#value'], FALSE);
-    $alt = 'the term name';
-    if ($global_default = variable_get('taxonomy_title_default_' . $form['#term']['vocabulary'], FALSE)) {
-      $alt = 'the global default pattern of <em>' . token_replace($global_default, array('term' => $form_state['term'])) . '</em>';
-    }
-    $form['taxonomy_title'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Term page heading'),
-      '#default_value' => $title,
-      '#description' => t('If left blank !alt will be used.', array('!alt' => $alt)),
-    );
+  $title = taxonomy_title_get($form['tid']['#value'], FALSE);
+  $alt = 'the term name';
+  if ($global_default = variable_get('taxonomy_title_default_' . $form['#term']['vocabulary'], FALSE)) {
+    $alt = 'the global default pattern of <em>' . token_replace($global_default, array('term' => $form_state['term'])) . '</em>';
   }
+  $form['taxonomy_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Term page heading'),
+    '#default_value' => $title,
+    '#description' => t('If left blank !alt will be used.', array('!alt' => $alt)),
+  );
 }
 
 /**
