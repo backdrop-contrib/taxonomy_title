@@ -1,8 +1,7 @@
 <?php
-
 /**
  * @file
- * Provides tokens, for use with page_title module.
+ * Provides tokens for the taxonomy title module.
  */
 
 /**
@@ -31,7 +30,7 @@ function taxonomy_title_tokens($type, $tokens, array $data = array(), array $opt
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'title':
-          $title = _taxonomy_title_get_title($term->tid);
+          $title = taxonomy_title_get($term->tid);
           if ($title) {
             $replacements[$original] = ($sanitize) ? check_plain($title) : $title;
           }

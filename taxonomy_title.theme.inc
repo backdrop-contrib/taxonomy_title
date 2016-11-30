@@ -1,11 +1,11 @@
 <?php
 /**
- * @file taxonomy_title.theme.inc
+ * @file
  * Theme functions for the taxonomy title module.
  */
 
 /**
- * Theme function for admin form, turns into a table.
+ * Theme function for admin form, turns it into a table.
  */
 function theme_taxonomy_title_admin_settings($variables) {
   $form = $variables['form'];
@@ -18,30 +18,31 @@ function theme_taxonomy_title_admin_settings($variables) {
   }
 
   $header = array(
-    t('Terms in vocabulary'),
+    t('Vocabulary for terms'),
     t('Global default value'),
     array('data' => t('Affect Heading tag'), 'class' => 'checkbox'),
     array('data' => $title_head, 'class' => 'checkbox'),
   );
 
   $rows = array();
-  foreach($form['taxonomy_title_page_titles']['#options'] as $vid => $name) {
+
+  foreach($form['taxonomy_title_page_titles']['#options'] as $key => $name) {
     $row = array();
     $row[] = check_plain($name);
-    $row[] = drupal_render($form['taxonomy_title_default_' . $vid]);
-    unset($form['taxonomy_title_headings'][$vid]['#title']);
-    $row[] = array('data' => drupal_render($form['taxonomy_title_headings'][$vid]), 'class' => 'checkbox');
-    unset($form['taxonomy_title_page_titles'][$vid]['#title']);
-    $row[] = array('data' => drupal_render($form['taxonomy_title_page_titles'][$vid]), 'class' => 'checkbox');
+    $row[] = backdrop_render($form['taxonomy_title_default_' . $key]);
+    unset($form['taxonomy_title_headings'][$key]['#title']);
+    $row[] = array('data' => backdrop_render($form['taxonomy_title_headings'][$key]), 'class' => 'checkbox');
+    unset($form['taxonomy_title_page_titles'][$key]['#title']);
+    $row[] = array('data' => backdrop_render($form['taxonomy_title_page_titles'][$key]), 'class' => 'checkbox');
 
     $rows[] = $row;
   }
 
   // Add a row with screenshots.
-  $heading_path = drupal_get_path('module', 'taxonomy_title') . '/includes/' . 'heading.png';
+  $heading_path = backdrop_get_path('module', 'taxonomy_title') . '/includes/' . 'heading.png';
   $heading_example = theme('image', array('path' => $heading_path));
 
-  $title_path = drupal_get_path('module', 'taxonomy_title') . '/includes/' . 'title.png';
+  $title_path = backdrop_get_path('module', 'taxonomy_title') . '/includes/' . 'title.png';
   $title_example = theme('image', array('path' => $title_path));
 
   $rows[] = array(
@@ -59,5 +60,5 @@ function theme_taxonomy_title_admin_settings($variables) {
 
   $form['#sorted'] = FALSE;
 
-  return drupal_render_children($form);
+  return backdrop_render_children($form);
 }

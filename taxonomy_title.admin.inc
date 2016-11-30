@@ -1,11 +1,13 @@
 <?php
-
 /**
  * @file
- * Settings form for taxonomy title.
+ * Admin pages and forms for the taxonomy title module.
  */
 
-function taxonomy_title_admin_settings(){
+/**
+ * Admin settings form.
+ */
+function taxonomy_title_settings_form($form, &$form_state) {
   $form = array();
 
   // Get all taxonomy vocabularies.
@@ -72,5 +74,11 @@ function taxonomy_title_admin_settings(){
     );
   }
 
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save configuration'));
+
   return system_settings_form($form);
+}
+
+function taxonomy_title_settings_form_submit() {
 }

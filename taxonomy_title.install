@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Database set up and clean-up for taxonomy title module.
+ * Database set up and clean-up for the taxonomy title module.
  */
 
 /**
@@ -18,7 +18,7 @@ function taxonomy_title_uninstall() {
  */
 function taxonomy_title_schema() {
   $schema['taxonomy_title'] = array(
-    'description' => 'Records separate titles/headings for taxonomy term pages',
+    'description' => 'Stores heading text for taxonomy term pages',
     'fields' => array(
       'tid' => array(
         'type' => 'int',
@@ -39,15 +39,6 @@ function taxonomy_title_schema() {
   return $schema;
 }
 
-/**
- * Implements hook_update_N(). Remove length from tid field in database.
- */
-function taxonomy_title_update_7001() {
-  $spec = array(
-    'type' => 'int',
-    'unsigned' => TRUE,
-    'default' => 0,
-    'not null' => TRUE,
-  );
-  db_change_field('taxonomy_title', 'tid', 'tid', $spec);
+function taxonomy_title_update_last_removed() {
+  return 7001;
 }
