@@ -64,14 +64,19 @@ function taxonomy_title_settings_form($form, &$form_state) {
       '#default_value' => array(),
       '#disabled' => TRUE,
     );
-    $form['settings']['notice'] = array(
-      '#weight' => 2,
-      '#markup' => '<p>' . t('* Since you have either the page title module or
-        the metatag module enabled, this module will be unable to affect the
-        title tags of your pages.  If you would like taxonomy titles to appear
-        in your title tags, please configure that module to use the provided
-        tokens.  Example: [term-title]') . '</p>',
-    );
+
+    $problem_module = FALSE;
+    if (module_exists('metatag')) {
+      $problem_module = 'Metatag';
+    }
+    elseif (module_exists('page_title')) {
+      $problem_module = 'Page Title';
+    }
+    if ($problem_module) {
+      $message = t('* Since you have the !module module enabled, Taxonomy Title will be unable to affect the title tags for your pages.  If you would like term titles to appear in your title tags instead of term names, please configure !module to use the [term-title] token.',
+        array('!module' => $problem_module));
+      backdrop_set_message($message, 'warning');
+    }
   }
 
   $form['actions']['#type'] = 'actions';
