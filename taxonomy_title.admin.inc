@@ -65,17 +65,38 @@ function taxonomy_title_settings_form($form, &$form_state) {
       '#disabled' => TRUE,
     );
 
-    $problem_module = FALSE;
-    if (module_exists('metatag')) {
-      $problem_module = 'Metatag';
+    $problematic_modules_known = array('metatag', 'page_title');
+    $problematic_modules_found = array();
+    // Go through the list of the known problematic modules...
+    foreach ($problematic_modules_known as $module) {
+      // ...and check if they are enabled.
+      if (module_exists($module)) {
+        // If found, get their human-readable name...
+        $module_info = system_get_info('module', $module);
+        // ...and store it in a list of found enabled problematic modules.
+        $problematic_modules_found[] = $module_info['name'];
+      }
     }
-    elseif (module_exists('page_title')) {
-      $problem_module = 'Page Title';
-    }
-    if ($problem_module) {
-      $message = t('* Since you have the !module module enabled, Taxonomy Title will be unable to affect the title tags for your pages.  If you would like term titles to appear in your title tags instead of term names, please configure !module to use the [term-title] token.',
-        array('!module' => $problem_module));
+
+    $problematic_modules_count = count($problematic_modules_found);
+
+    if ($problematic_modules_count != 0) {
+
+      if ($problematic_modules_count == 1) {
+        $problematic_modules = $problematic_modules_found[0];
+      }
+      else {
+        $all_but_last_module = array_slice($problematic_modules_found, 0, $problematic_modules_count - 1);
+        $problematic_modules = implode(', ', $all_but_last_module) . t('and') . end($problematic_modules_found);
+      }
+
+      $module_text = format_plural($problematic_modules_count, 'module', 'modules');
+
+      $message = t('* Since you have the !modules !module_text enabled, Taxonomy Title will be unable to affect the title tags for your pages. If you would like term titles to appear in your title tags instead of term names, please configure !modules to use the <code>[term-title]</code> token.',
+        array('!modules' => $problematic_modules, '!module_text' => $module_text));
+
       backdrop_set_message($message, 'warning');
+
     }
   }
 
