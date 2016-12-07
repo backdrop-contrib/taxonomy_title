@@ -51,7 +51,6 @@ Current Maintainers
 Credits
 -------
 
-- Ported to Backdrop CMS by [jen Lampton](https://github.com/jenlampton).
 - Originally written for Drupal by [Jen Lampton](https://www.drupal.org/u/jenlampton).
 
 License
