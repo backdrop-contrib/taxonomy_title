@@ -18,8 +18,9 @@ function taxonomy_title_settings_form($form, &$form_state) {
   $page_title_options = array();
 
   // Set up holders for default values.
-  $heading_defaults = variable_get('taxonomy_title_headings', array());
-  $page_title_defaults = variable_get('taxonomy_title_page_titles', array());
+  $config = config('taxonomy_title.settings');
+  $heading_defaults = $config->get('headings', array());
+  $page_title_defaults = $config->get('page_titles', array());
 
   $form['settings'] = array(
     '#theme' => 'taxonomy_title_admin_settings',
@@ -27,20 +28,20 @@ function taxonomy_title_settings_form($form, &$form_state) {
 
   $link = theme('token_tree_link', array('text' => 'Browse available tokens', 'token_types' => array('term')));
 
-  foreach ($vocabs as $vid => $vocab) {
-    $heading_options[$vid] = $vocab->name;
-    $page_title_options[$vid] = $vocab->name;
-    if (!isset($heading_defaults[$vid])) {
-      $heading_defaults[$vid] = $vid;
+  foreach ($vocabs as $key => $vocab) {
+    $heading_options[$key] = $vocab->name;
+    $page_title_options[$key] = $vocab->name;
+    if (!isset($heading_defaults[$key])) {
+      $heading_defaults[$key] = $key;
     }
-    if (!isset($page_title_defaults[$vid])) {
-      $page_title_defaults[$vid] = $vid;
+    if (!isset($page_title_defaults[$key])) {
+      $page_title_defaults[$key] = $key;
     }
 
-    $form['settings']['taxonomy_title_default_' . $vid] = array(
+    $form['settings']['taxonomy_title_default_' . $key] = array(
       '#type' => 'textfield',
       '#description' => t('Leave blank for none.') . ' ' . $link,
-      '#default_value' => variable_get('taxonomy_title_default_' . $vid, ''),
+      '#default_value' => $config->get('default_' . $key, ''),
     );
   }
 
@@ -81,7 +82,6 @@ function taxonomy_title_settings_form($form, &$form_state) {
     $problematic_modules_count = count($problematic_modules_found);
 
     if ($problematic_modules_count != 0) {
-
       if ($problematic_modules_count == 1) {
         $problematic_modules = $problematic_modules_found[0];
       }
@@ -103,8 +103,19 @@ function taxonomy_title_settings_form($form, &$form_state) {
   $form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array('#type' => 'submit', '#value' => t('Save configuration'));
 
-  return system_settings_form($form);
+  return $form;
 }
 
-function taxonomy_title_settings_form_submit() {
+/**
+ * Submit handler for taxonomy_title_settings_form().
+ */
+function taxonomy_title_settings_form_submit(&$form, &$form_state) {
+  $config = config('taxonomy_title.settings');
+  $vocabs = taxonomy_get_vocabularies();
+  foreach ($vocabs as $key => $vocab) {
+    $config->set('default_' . $key, $form_state['values']['taxonomy_title_default_' . $key]);
+  }
+  $config->set('headings', $form_state['values']['taxonomy_title_headings']);
+  $config->set('page_titles', $form_state['values']['taxonomy_title_page_titles']);
+  $config->save();
 }

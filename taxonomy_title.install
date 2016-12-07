@@ -39,6 +39,31 @@ function taxonomy_title_schema() {
   return $schema;
 }
 
+/**
+ * Implements hook_update_last_removed().
+ */
 function taxonomy_title_update_last_removed() {
   return 7001;
+}
+
+/**
+ * Convert to Config Management.
+ */
+function taxonomy_title_update_1000() {
+  $config = config('taxonomy_title.settings');
+  $config->set('headings', variable_get('taxonomy_title_headings', array()));
+  $config->set('page_titles', variable_get('taxonomy_title_page_titles', array()));
+
+  $vocabs = taxonomy_get_vocabularies();
+  foreach ($vocabs as $key => $vocab) {
+    $config->set('default_' . $key, variable_get('taxonomy_title_default_' . $key, ''));
+    update_variable_del('taxonomy_title_default_' . $key);
+  }
+
+  // Save the new config file.
+  $config->save();
+
+  // Clean up old variables.
+  update_variable_del('taxonomy_title_headings');
+  update_variable_del('taxonomy_title_page_titles');
 }

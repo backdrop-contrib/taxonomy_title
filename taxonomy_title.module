@@ -5,6 +5,17 @@
  */
 
 /**
+ * Implements hook_config_info().
+ */
+function taxonomy_title_config_info() {
+  $prefixes['taxonomy_title.settings'] = array(
+    'label' => t('Taxonomy title settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
  * Implementation of hook_menu().
  */
 function taxonomy_title_menu(){
@@ -42,7 +53,7 @@ function taxonomy_title_theme($existing, $type, $theme, $path) {
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
   $title = taxonomy_title_get($form['tid']['#value'], FALSE);
   $alt = 'the term name';
-  if ($global_default = variable_get('taxonomy_title_default_' . $form['#term']['vocabulary'], FALSE)) {
+  if ($global_default = config_get('taxonomy_title.settings', 'default_' . $form['#term']['vocabulary'])) {
     $alt = 'the global default pattern of <em>' . token_replace($global_default, array('term' => $form_state['term'])) . '</em>';
   }
   $form['taxonomy_title'] = array(
@@ -64,16 +75,18 @@ function taxonomy_title_preprocess_page(&$variables) {
     $term = taxonomy_term_load($tid);
 
     // Get the settings.
-    $page_title_settings = variable_get('taxonomy_title_page_titles', array());
+    $page_title_settings = config_get('taxonomy_title.settings', 'page_titles');
+
     // If there's no setting, assume setting is ON.
-    $affect_title = (!isset($page_title_settings[$term->vocabulary]) || $page_title_settings[$term->vocabulary] === $term->vocabulary);
+    $affect_title = (is_null($page_title_settings) || !isset($page_title_settings[$term->vocabulary]) || $page_title_settings[$term->vocabulary] === $term->vocabulary);
 
     if ($affect_title && !module_exists('page_title') && !module_exists('metatag')) {
 
       // Retrieve the title based on tid.
       $title = taxonomy_title_get($tid);
+
       if (!empty($title)){
-        $site_name = variable_get('site_name', 'Backdrop CMS');
+        $site_name = config_get('system.core', 'site_name');
         $head_title = array($title, $site_name);
         $variables['head_title'] = implode(' | ', $head_title);
       }
@@ -92,7 +105,7 @@ function taxonomy_title_preprocess_layout(&$variables) {
     $term = taxonomy_term_load($tid);
 
     // Get the settings.
-    $heading_settings = variable_get('taxonomy_title_headings', array());
+    $heading_settings = config_get('taxonomy_title.settings', 'headings');
     // If there's no setting, assume setting is ON.
     $affect_heading = (!isset($heading_settings[$term->vocabulary]) || $heading_settings[$term->vocabulary] === $term->vocabulary);
 
@@ -108,7 +121,8 @@ function taxonomy_title_preprocess_layout(&$variables) {
 /**
  * Helper function: determine if we are on a taxonomy/term page.
  *
- * @return [type]
+ * @return (bool)
+ *   TRUE if the page is a term page, FALSE if not.
  */
 function taxonomy_title_is_term_page() {
   if (arg(0) == 'taxonomy' && arg(1) == 'term' && is_numeric(arg(2)) && arg(2) > 0 && !arg(3)) {
@@ -165,8 +179,9 @@ function taxonomy_title_get($tid, $default = TRUE) {
   if ($title == FALSE && $default == TRUE) {
     // Check for global default value.
     $term = taxonomy_term_load($tid);
-    $default = variable_get('taxonomy_title_default_' . $term->vocabulary, '');
+    $default = config_get('taxonomy_title.settings', 'default_' . $term->vocabulary);
     $title = token_replace($default, array('term' => $term));
+
   }
   if (function_exists('i18n_string_translate')) {
     $title = i18n_string_translate(array('taxonomy_title', 'term', $tid, 'title'), $title, array('sanitize' => FALSE));
