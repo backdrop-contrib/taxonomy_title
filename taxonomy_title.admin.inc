@@ -90,10 +90,10 @@ function taxonomy_title_settings_form($form, &$form_state) {
         $problematic_modules = implode(', ', $all_but_last_module) . t('and') . end($problematic_modules_found);
       }
 
-      $module_text = format_plural($problematic_modules_count, 'module', 'modules');
+      $singular_text = '* Since you have the !modules module enabled, Taxonomy Title will be unable to affect the title tags for your term pages. If you would like term titles to appear in your title tags instead of term names, please configure !modules to use the <code>[term-title]</code> token.';
+      $plural_text = '* Since you have the !modules modules enabled, Taxonomy Title will be unable to affect the title tags for your term pages. If you would like term titles to appear in your title tags instead of term names, please configure !modules to use the <code>[term-title]</code> token.';
 
-      $message = t('* Since you have the !modules !module_text enabled, Taxonomy Title will be unable to affect the title tags for your pages. If you would like term titles to appear in your title tags instead of term names, please configure !modules to use the <code>[term-title]</code> token.',
-        array('!modules' => $problematic_modules, '!module_text' => $module_text));
+      $message = format_plural($problematic_modules_count, $singular_text, $plural_text, array('!modules' => $problematic_modules));
 
       backdrop_set_message($message, 'warning');
 
