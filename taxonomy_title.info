@@ -1,5 +1,5 @@
 type = module
-name = Taxonomy title
+name = Taxonomy Title
 description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
 backdrop = 1.x
