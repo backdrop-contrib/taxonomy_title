@@ -51,7 +51,7 @@ function taxonomy_title_theme($existing, $type, $theme, $path) {
  * Implements hook_form_FORM_ID_alter().
  */
 function taxonomy_title_form_taxonomy_form_term_alter(&$form, &$form_state) {
-  $title = taxonomy_title_get($form['tid']['#value'], FALSE);
+  $title = taxonomy_title_get($form['#term']['tid']['#value'], FALSE);
   $alt = 'the term name';
   if ($global_default = config_get('taxonomy_title.settings', 'default_' . $form['#term']['vocabulary'])) {
     $alt = 'the global default pattern of <em>' . token_replace($global_default, array('term' => $form_state['term'])) . '</em>';
