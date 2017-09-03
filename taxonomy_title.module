@@ -19,7 +19,7 @@ function taxonomy_title_config_info() {
  * Implementation of hook_menu().
  */
 function taxonomy_title_menu(){
-  $items['admin/config/search/taxonomy_title'] = array(
+  $items['admin/config/metadata/taxonomy_title'] = array(
     'title' => 'Taxonomy title',
     'description' => 'Settings for the taxonomy title module.',
     'page callback' => 'backdrop_get_form',

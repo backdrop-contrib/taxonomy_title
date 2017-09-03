@@ -4,4 +4,4 @@ description = Enables control over the taxonomy page titles.
 dependencies[] = taxonomy
 backdrop = 1.x
 
-configure = admin/config/search/taxonomy_title
+configure = admin/config/metadata/taxonomy_title

@@ -28,7 +28,7 @@ Installation
   https://backdropcms.org/guide/modules
 
 - Visit the configuration page under Administration > Configuration >
-  Search & Metadata > Taxonomy Title (admin/config/search/taxonomy_title) and
+  Metadata > Taxonomy Title (admin/config/metadata/taxonomy_title) and
   enter the required behavior for each vocabulary.
 
 Documentation
